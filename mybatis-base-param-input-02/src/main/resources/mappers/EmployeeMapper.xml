@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--  namespace =  mapper对应接口的全限定符 -->
+<mapper namespace="com.atguigu.mapper.EmployeeMapper">
+    <select id="queryById" resultType="com.atguigu.pojo.Employee">
+        <!-- #{empId}代表动态传入的参数,并且进行赋值!后面详细讲解 -->
+        select emp_id empId,emp_name empName, emp_salary empSalary from
+        t_emp where emp_id = #{id}
+    </select>
+    <!-- 1. 传一个简单类型，返回影响行数-->
+    <delete id="deleteById" >
+         delete from t_emp where emp_id = #{id}
+    </delete>
+
+    <!-- 通过mapUnderscoreToCamelCase自动转换字段名字-->
+    <select id="queryBySalary" resultType="com.atguigu.pojo.Employee">
+        select emp_id,emp_name,emp_salary  from
+        t_emp where emp_salary = #{salary}
+    </select>
+
+    <!-- 2. 传一个对象类型，获取插入的主键-->
+    <insert id="insertEmployee" parameterType="com.atguigu.pojo.Employee" useGeneratedKeys="true" keyProperty="empId">
+        insert into t_emp(emp_name,emp_salary) values(#{empName},#{empSalary})
+    </insert>
+
+    <!-- 3. 传多个简单类型，返回对象或者对象列表
+         方案一：传多个简单类型的时候，需要使用@Param注解进行指定参数的名称
+         方案二：默认机制，arg0,arg1,...从左到右依次对应传入的参数
+    -->
+    <select id="queryByNameAndSalary" resultType="com.atguigu.pojo.Employee">
+        select emp_id empId,emp_name empName, emp_salary empSalary from
+        t_emp where emp_name = #{a} and emp_salary = #{b}
+<!--      默认机制  t_emp where emp_name = #{ary0} and emp_salary = #{ary1}-->
+    </select>
+
+    <!-- 4. 传一个map类型, 填写map的key，返回的是单个值或者单值集合 -->
+    <select id="queryByNameAndSalary2" resultType="String">
+        select emp_name empName from
+        t_emp where emp_name = #{name} and emp_salary = #{salary} limit 1
+    </select>
+    <!-- 5. 传一个map类型, 返回map -->
+    <select id="queryByNameAndSalary3" parameterType="map" resultType="map">
+        select emp_id,emp_name,emp_salary from
+        t_emp
+        <where>
+            <if test="name != null and name != ''">
+                AND emp_name = #{name}
+            </if>
+            <if test="salary != null and salary != 0">
+                AND emp_salary = #{salary}
+            </if>
+        </where>
+    </select>
+
+
+</mapper>
